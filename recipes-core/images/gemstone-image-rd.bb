@@ -8,12 +8,13 @@ LICENSE = "Apache-2.0"
 PACKAGE_INSTALL = "\
     ${VIRTUAL-RUNTIME_base-utils} \
     base-files \
-    initramfs-framework-base \
-    initramfs-module-rootfs \
-    initramfs-module-firstboot \
-    parted \
-    e2fsprogs-resize2fs \
     btrfs-tools \
+    e2fsprogs-resize2fs \
+    initramfs-framework-base \
+    initramfs-module-firstboot \
+    initramfs-module-rootfs \
+    parted \
+    psplash \
     "
 
 # Don't allow the initramfs to contain a kernel
