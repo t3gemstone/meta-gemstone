@@ -24,6 +24,7 @@ IMAGE_LINGUAS = ""
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 
 DEPENDS:beagley-ai += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
+DEPENDS:t3-gem-o1 += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
 
 inherit core-image
 
