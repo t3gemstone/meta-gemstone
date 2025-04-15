@@ -11,9 +11,14 @@ PACKAGE_INSTALL = "\
     initramfs-framework-base \
     initramfs-module-rootfs \
     initramfs-module-firstboot \
+    initramfs-module-usbgadget \
+    initramfs-module-gemfinish \
     parted \
     e2fsprogs-resize2fs \
     btrfs-tools \
+    kernel-module-usb-f-acm \
+    kernel-module-u-serial \
+    kernel-module-libcomposite \
     "
 
 # Don't allow the initramfs to contain a kernel
