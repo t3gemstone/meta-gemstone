@@ -1,0 +1,15 @@
+# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+POKY_BBLAYERS_CONF_VERSION = "2"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+GEMSTONE_WORKDIR = "/home/workdir"
+
+BBLAYERS ?= " \
+  ${GEMSTONE_WORKDIR}/yocto/openembedded-core/meta \
+  ${GEMSTONE_WORKDIR}/yocto/meta-arm/meta-arm-toolchain \
+  ${GEMSTONE_WORKDIR}/yocto/meta-arm/meta-arm \
+  ${GEMSTONE_WORKDIR}/yocto/meta-gemstone \
+  "
