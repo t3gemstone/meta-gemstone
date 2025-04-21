@@ -21,6 +21,8 @@ PACKAGE_INSTALL = "\
     kernel-module-libcomposite \
     "
 
+PACKAGE_INSTALL:remove:qemuarm64 = "kernel-module-usb-f-acm kernel-module-u-serial kernel-module-libcomposite"
+
 # Don't allow the initramfs to contain a kernel
 PACKAGE_EXCLUDE = "kernel-image-*"
 

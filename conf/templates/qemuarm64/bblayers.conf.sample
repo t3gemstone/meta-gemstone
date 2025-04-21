@@ -9,7 +9,5 @@ GEMSTONE_WORKDIR = "/home/workdir"
 
 BBLAYERS ?= " \
   ${GEMSTONE_WORKDIR}/yocto/openembedded-core/meta \
-  ${GEMSTONE_WORKDIR}/yocto/meta-arm/meta-arm-toolchain \
-  ${GEMSTONE_WORKDIR}/yocto/meta-arm/meta-arm \
   ${GEMSTONE_WORKDIR}/yocto/meta-gemstone \
   "
