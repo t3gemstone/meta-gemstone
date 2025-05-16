@@ -1,0 +1,24 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+        echo -n "Loading modules: "
+        modprobe pvrsrvkm
+    ;;
+    stop)
+        echo -n "Removing modules: "
+        modprobe -r pvrsrvkm
+    ;;
+    restart|force-reload)
+        echo -n "Reloading modules: "
+        modprobe -r pvrsrvkm
+        modprobe pvrsrvkm
+    ;;
+    *)
+        N=/etc/init.d/$NAME
+        echo "Usage: $N {start|stop|restart|force-reload}" >&2
+        exit 1
+    ;;
+esac
+
+exit 0

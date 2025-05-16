@@ -1,0 +1,6 @@
+export QT_QPA_EGLFS_KMS_CONFIG=/etc/qt/kms.json
+export LC_ALL='en_US.UTF-8'
+export QT_QPA_PLATFORM=eglfs
+export QT_QPA_EGLFS_NO_LIBINPUT=1
+export QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=/dev/input/event1
+export QT_QPA_EGLFS_HIDECURSOR=0
