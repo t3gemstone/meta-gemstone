@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend:t3-gem-s1 := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${@bb.utils.contains('DISTRO_GEMSTONE_QT_INCLUDED', '1', '${THISDIR}/files:', '', d)}"

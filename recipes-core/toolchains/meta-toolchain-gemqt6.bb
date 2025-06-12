@@ -12,11 +12,13 @@ TOOLCHAIN_TARGET_TASK += "\
     libgbm-dev \
     libdrm-dev \
     mesa-pvr-dev \
+    qtwebengine \
     "
 
 TI_TOOLCHAIN_TARGET_TASK = "\
     ti-img-rogue-driver \
     ti-img-rogue-umlibs \
+    libvk-rogue \
     "
 
 TOOLCHAIN_TARGET_TASK:append:t3-gem-o1 = "${TI_TOOLCHAIN_TARGET_TASK}"

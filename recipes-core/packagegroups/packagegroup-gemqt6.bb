@@ -42,6 +42,7 @@ RDEPENDS:${PN} = " \
     qtscxml \
     qtpdf \
     qt5compat \
+    qt3d \
     ${QT5_FONTS} \
     ${QT5_QTQUICK3D} \
 "
