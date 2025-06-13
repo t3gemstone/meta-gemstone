@@ -12,8 +12,6 @@ PACKAGE_CLASSES ?= "package_deb"
 
 SDKMACHINE ?= "x86_64"
 
-OE_TERMINAL = "gnome"
-
 PATCHRESOLVE = "noop"
 
 BB_DISKMON_DIRS ??= "\
