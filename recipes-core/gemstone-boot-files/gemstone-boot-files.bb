@@ -17,10 +17,6 @@ do_install:append:j722s() {
     install -d "${D}/boot/overlays"
 
     install -m 0644 "${DEPLOY_DIR_IMAGE}/tiboot3.bin" "${D}/boot"
-    install -m 0644 "${DEPLOY_DIR_IMAGE}/tispl.bin" "${D}/boot"
-    install -m 0644 "${DEPLOY_DIR_IMAGE}/u-boot.img" "${D}/boot"
-    install -m 0644 "${DEPLOY_DIR_IMAGE}/uEnv.txt" "${D}/boot"
-    install -m 0644 "${DEPLOY_DIR_IMAGE}/Image" "${D}/boot"
     install -m 0644 "${DEPLOY_DIR_IMAGE}/gemstone-image-rd-${MACHINE}.cpio.gz" "${D}/boot"
     install -m 0644 "${DEPLOY_DIR_IMAGE}/k3-am67a-${MACHINE}.dtb" "${D}/boot"
 
