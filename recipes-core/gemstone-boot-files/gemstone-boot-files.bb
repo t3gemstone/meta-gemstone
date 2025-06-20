@@ -9,9 +9,11 @@ do_compile[noexec] = "1"
 
 do_install[depends] += "\
     virtual/kernel:do_deploy \
-    ${@bb.utils.contains('SOC_FAMILY', 'j722s', 'virtual/bootloader:do_deploy', '', d)} \
     gemstone-image-rd:do_image_complete \
     "
+
+RDEPENDS:${PN}:t3-gem-o1 += "u-boot-t3-gem-o1"
+RDEPENDS:${PN}:beagley-ai += "u-boot-bb.org"
 
 do_install:append:j722s() {
     install -d "${D}/boot/overlays"
