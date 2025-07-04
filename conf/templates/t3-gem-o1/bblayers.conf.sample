@@ -15,4 +15,7 @@ BBLAYERS ?= " \
   ${GEMSTONE_WORKDIR}/yocto/meta-ti/meta-ti-extras \
   ${GEMSTONE_WORKDIR}/yocto/meta-ti/meta-beagle \
   ${GEMSTONE_WORKDIR}/yocto/meta-gemstone \
+  ${GEMSTONE_WORKDIR}/yocto/meta-openembedded/meta-oe \
+  ${GEMSTONE_WORKDIR}/yocto/meta-openembedded/meta-python \
+  ${GEMSTONE_WORKDIR}/yocto/meta-openembedded/meta-networking \
   "

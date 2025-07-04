@@ -1,8 +1,8 @@
 require recipes-bsp/u-boot/u-boot-ti.inc
 
-SUMMARY = "T3 Gemstone O1 U-Boot"
+SUMMARY = "T3 Gemstone S1 U-Boot"
 
-COMPATIBLE_MACHINE = "t3-gem-o1"
+COMPATIBLE_MACHINE = "t3-gem-s1"
 
 PV = "2025.04"
 
@@ -13,21 +13,15 @@ SRCREV = "d4a65c7f993a977bd9cfa6b9ac83ba7a17701f20"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-SRC_URI:append:t3-gem-o1 = " \
+SRC_URI:append:t3-gem-s1 = " \
     file://uEnv-desktop.txt \
     file://uEnv-rd.txt \
     file://fragment-mmc-env.config \
     "
 
-UBOOT_CONFIG_FRAGMENTS:append:t3-gem-o1 = " fragment-mmc-env.config"
-UBOOT_ENV:t3-gem-o1 = "uEnv"
+UBOOT_CONFIG_FRAGMENTS:append:t3-gem-s1 = " fragment-mmc-env.config"
+UBOOT_ENV:t3-gem-s1 = "uEnv"
 
-do_configure:prepend:t3-gem-o1() {
+do_configure:prepend:t3-gem-s1() {
     cp "${WORKDIR}/fragment-mmc-env.config" "${S}/configs/"
-
-    if [ "${DISTRO_GEMSTONE_QT_INCLUDED}" = "1" ]; then
-        mv "${WORKDIR}/uEnv-desktop.txt" "${WORKDIR}/uEnv.txt"
-    else
-        mv "${WORKDIR}/uEnv-rd.txt" "${WORKDIR}/uEnv.txt"
-    fi
 }

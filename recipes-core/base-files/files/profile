@@ -1,0 +1,4 @@
+export LC_ALL='en_US.UTF-8'
+export QSG_RHI_BACKEND=vulkan
+export XDG_RUNTIME_DIR=/run/user/1000
+export WAYLAND_DISPLAY=wayland-1

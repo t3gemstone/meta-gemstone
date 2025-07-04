@@ -1,4 +1,6 @@
-MACHINE ??= "qemuarm64"
+MACHINE ??= "t3-gem-s1"
+
+TCLIBC ?= "glibc"
 
 DL_DIR ?= "${GEMSTONE_WORKDIR}/build/downloads"
 
@@ -8,11 +10,13 @@ TMPDIR = "${GEMSTONE_WORKDIR}/build/tmp"
 
 DISTRO ?= "gemstone"
 
-DISTRO_GEMSTONE_QT_INCLUDED ?= "0"
+DISTRO_GEMSTONE_QT_INCLUDED = "1"
 
 PACKAGE_CLASSES ?= "package_deb"
 
 SDKMACHINE ?= "x86_64"
+
+OE_TERMINAL = "gnome"
 
 PATCHRESOLVE = "noop"
 

@@ -1,0 +1,16 @@
+[connection]
+id=Static
+uuid=e5d76637-00e0-4e20-a3f7-ff6c7c74e8e9
+type=ethernet
+autoconnect-priority=-999
+timestamp=1748868141
+
+[ipv4]
+method=manual
+ignore-auto-dns=true
+ignore-auto-routes=true
+address1=10.0.0.71/24
+
+[ipv6]
+addr-gen-mode=stable-privacy
+method=disabled

@@ -11,4 +11,7 @@ BBLAYERS ?= " \
   ${GEMSTONE_WORKDIR}/yocto/openembedded-core/meta \
   ${GEMSTONE_WORKDIR}/yocto/meta-gemstone \
   ${GEMSTONE_WORKDIR}/yocto/meta-intel \
+  ${GEMSTONE_WORKDIR}/yocto/meta-openembedded/meta-oe \
+  ${GEMSTONE_WORKDIR}/yocto/meta-openembedded/meta-python \
+  ${GEMSTONE_WORKDIR}/yocto/meta-openembedded/meta-networking \
   "

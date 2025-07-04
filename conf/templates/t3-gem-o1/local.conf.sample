@@ -8,6 +8,8 @@ TMPDIR = "${GEMSTONE_WORKDIR}/build/tmp"
 
 DISTRO ?= "gemstone"
 
+DISTRO_GEMSTONE_QT_INCLUDED ?= "0"
+
 PACKAGE_CLASSES ?= "package_deb"
 
 SDKMACHINE ?= "x86_64"
