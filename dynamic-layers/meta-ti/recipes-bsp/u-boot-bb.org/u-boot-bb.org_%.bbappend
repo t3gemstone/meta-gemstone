@@ -10,9 +10,9 @@ do_configure:prepend:beagley-ai() {
     cp "${WORKDIR}/fragment-mmc-env.config" "${S}/configs/"
 
     if [ "${DISTRO_GEMSTONE_QT_INCLUDED}" = "1" ]; then
-        mv "${WORKDIR}/uEnv-desktop.txt" "${WORKDIR}/uEnv.txt"
+        cp "${WORKDIR}/uEnv-desktop.txt" "${WORKDIR}/uEnv.txt"
     else
-        mv "${WORKDIR}/uEnv-rd.txt" "${WORKDIR}/uEnv.txt"
+        cp "${WORKDIR}/uEnv-rd.txt" "${WORKDIR}/uEnv.txt"
     fi
 }
 
