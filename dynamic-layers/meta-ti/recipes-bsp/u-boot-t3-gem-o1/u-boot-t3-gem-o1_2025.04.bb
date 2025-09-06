@@ -9,7 +9,7 @@ PV = "2025.04"
 UBOOT_GIT_URI = "git://github.com/t3gemstone/u-boot.git"
 UBOOT_GIT_PROTOCOL = "https"
 BRANCH = "v2025.04-rc3-t3-gem-o1"
-SRCREV = "d4a65c7f993a977bd9cfa6b9ac83ba7a17701f20"
+SRCREV = "53fd3c43d8def2a08cc39769050e1c9874400acf"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
