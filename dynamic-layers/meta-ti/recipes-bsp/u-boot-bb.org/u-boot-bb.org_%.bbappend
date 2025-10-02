@@ -16,6 +16,13 @@ do_configure:prepend:beagley-ai() {
     fi
 }
 
+do_deploy[vardeps] += "SRCPV SRCREV PV SRCREV_FORMAT"
+
+do_deploy:append:k3() {
+    install -d ${DEPLOYDIR}/bsp-srcrevs
+    printf '%s\n' "${SRCREV}" > ${DEPLOYDIR}/bsp-srcrevs/u-boot.rev
+}
+
 UBOOT_CONFIG_FRAGMENTS:append:beagley-ai = " fragment-mmc-env.config"
 
 UBOOT_ENV:beagley-ai = "uEnv"

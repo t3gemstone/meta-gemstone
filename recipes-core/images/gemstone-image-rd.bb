@@ -34,6 +34,13 @@ DEPENDS:t3-gem-o1 += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
 DEPENDS:t3-gem-s1 += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
 DEPENDS:beagley-ai += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
 
+do_calculate_sha() {
+    install -d ${DEPLOY_DIR_IMAGE}/bsp-srcrevs
+    sha256sum ${WORKDIR}/deploy-gemstone-image-rd-image-complete/${IMAGE_LINK_NAME}.cpio.gz | awk '{print $1}' > "${DEPLOY_DIR_IMAGE}/bsp-srcrevs/initrd.rev"
+}
+
+addtask calculate_sha after do_image_cpio before do_image_complete
+
 inherit core-image
 
 # Use the same restriction as initramfs-module-install

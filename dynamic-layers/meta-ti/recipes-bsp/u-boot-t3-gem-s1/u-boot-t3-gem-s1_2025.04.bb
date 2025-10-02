@@ -25,3 +25,10 @@ UBOOT_ENV:t3-gem-s1 = "uEnv"
 do_configure:prepend:t3-gem-s1() {
     cp "${WORKDIR}/fragment-mmc-env.config" "${S}/configs/"
 }
+
+do_deploy[vardeps] += "SRCPV SRCREV PV SRCREV_FORMAT"
+
+do_deploy:append:k3() {
+    install -d ${DEPLOYDIR}/bsp-srcrevs
+    printf '%s\n' "${SRCREV}" > ${DEPLOYDIR}/bsp-srcrevs/u-boot.rev
+}

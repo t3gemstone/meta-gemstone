@@ -15,6 +15,26 @@ do_install[depends] += "\
 RDEPENDS:${PN}:t3-gem-o1 += "u-boot-t3-gem-o1"
 RDEPENDS:${PN}:beagley-ai += "u-boot-bb.org"
 
+PR[vardepsexpands] += "BSP_REV_INPUTS"
+BSP_REV_INPUTS = "${DEPLOY_DIR_IMAGE}/bsp-srcrevs/u-boot.rev ${DEPLOY_DIR_IMAGE}/bsp-srcrevs/kernel.rev"
+
+def bsp_rev(d):
+    import os, re
+    deploy = d.getVar("DEPLOY_DIR_IMAGE")
+    revs = []
+    for name in ("u-boot", "kernel", "initrd"):
+        p = os.path.join(deploy, "bsp-srcrevs", f"{name}.rev")
+        if os.path.exists(p):
+            with open(p) as f:
+                s = f.read().strip()
+            revs.append(f"{name}{s[:5]}")
+        else:
+            revs.append("norev")
+    return (("." + ".".join(revs)) if revs else "")
+
+PV = "1.0"
+PR = "r0${@bsp_rev(d)}"
+
 do_install:append:j722s() {
     install -d "${D}/boot/overlays"
 
