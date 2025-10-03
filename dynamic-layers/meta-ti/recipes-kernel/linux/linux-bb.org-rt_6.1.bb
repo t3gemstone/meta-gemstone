@@ -64,10 +64,3 @@ KERNEL_DEVICETREE:append:beagley-ai = " \
     ti/k3-am67a-beagley-ai-spidev0.dtbo \
     ti/k3-am67a-beagley-ai-uart-ttyama0.dtbo \
 "
-
-do_deploy[vardeps] += "SRCPV SRCREV PV SRCREV_FORMAT"
-
-do_deploy:append:k3() {
-    install -d ${DEPLOYDIR}/bsp-srcrevs
-    printf '%s\n' "${SRCREV}" > ${DEPLOYDIR}/bsp-srcrevs/kernel.rev
-}

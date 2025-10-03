@@ -31,10 +31,3 @@ do_configure:prepend:t3-gem-o1() {
         mv "${WORKDIR}/uEnv-rd.txt" "${WORKDIR}/uEnv.txt"
     fi
 }
-
-do_deploy[vardeps] += "SRCPV SRCREV PV SRCREV_FORMAT"
-
-do_deploy:append:k3() {
-    install -d ${DEPLOYDIR}/bsp-srcrevs
-    printf '%s\n' "${SRCREV}" > ${DEPLOYDIR}/bsp-srcrevs/u-boot.rev
-}
