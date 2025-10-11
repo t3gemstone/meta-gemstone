@@ -1,5 +1,5 @@
 firstboot=1
-overlays=k3-am67a-t3-gem-o1-spidev0-2cs.dtbo k3-am67a-t3-gem-o1-i2c1-400000.dtbo
+overlays=k3-am67a-t3-gem-o1-i2c1-400000.dtbo k3-am67a-t3-gem-o1-pwm-ecap0-gpio12.dtbo k3-am67a-t3-gem-o1-pwm-epwm1-gpio13.dtbo k3-am67a-t3-gem-o1-spidev0-2cs.dtbo
 
 bootpart=1:1
 initrdaddr=0x90000000
