@@ -1,6 +1,6 @@
 bootpart=1:1
 get_kern_mmc=load mmc ${bootpart} ${loadaddr} Image
 get_fdt_mmc=load mmc ${bootpart} ${fdtaddr} k3-am67a-t3-gem-o1.dtb;fdt addr ${fdtaddr};fdt resize 8192
-args_mmc=setenv bootargs console=${console} ${optargs} root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait
+args_mmc=setenv bootargs console=${console} ${optargs} root=/dev/mmcblk${mmcdev}p2 rw rootfstype=ext4 rootwait
 boot_mmc=run get_kern_mmc;run get_fdt_mmc;booti ${loadaddr} - ${fdtaddr}
 distro_bootcmd=run check_and_run_cores;run args_mmc;run boot_mmc
