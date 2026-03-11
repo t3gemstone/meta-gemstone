@@ -1,7 +1,7 @@
 From 9b14eeca05b4560e1859993be4c9f51ed3232a88 Mon Sep 17 00:00:00 2001
 From: Nazmi Aras <nazmi.aras@t3gemstone.org>
 Date: Sat, 7 Mar 2026 14:53:25 +0300
-Subject: [PATCH] Added beagley-ai overlays
+Subject: [PATCH] Add beagley-ai overlays
 
 ---
  arch/arm64/boot/dts/ti/Makefile               |   7 +

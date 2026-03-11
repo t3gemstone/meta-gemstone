@@ -1,7 +1,7 @@
 From cf2fd72d3f9ec018c5b6ab2b0b2530bb77143b4e Mon Sep 17 00:00:00 2001
 From: Nazmi Aras <nazmi.aras@t3gemstone.org>
 Date: Tue, 10 Mar 2026 15:54:16 +0300
-Subject: [PATCH] updated beagley-ai dts
+Subject: [PATCH] update beagley-ai dts
 
 ---
  .../arm64/boot/dts/ti/k3-am67a-beagley-ai.dts | 481 +++++++++++++++++-

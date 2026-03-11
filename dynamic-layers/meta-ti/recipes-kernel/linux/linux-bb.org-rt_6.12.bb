@@ -20,8 +20,8 @@ KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT} ${EXTRA_DTC_ARGS}"
 
 S = "${WORKDIR}/git"
 
-SRC_URI += "file://0001-Added-beagley-ai-overlays.patch \
-            file://0002-updated-beagley-ai-dts.patch"
+SRC_URI += "file://0001-add-beagley-ai-overlays.patch \
+            file://0002-update-beagley-ai-dts.patch"
 
 # 6.12.24 version for 64-bit
 SRCREV:aarch64 = "708e1e0be5126a696eaee37a2b027bc4d1f575c4"

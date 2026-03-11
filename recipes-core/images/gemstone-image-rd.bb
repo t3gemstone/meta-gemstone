@@ -16,12 +16,7 @@ PACKAGE_INSTALL = "\
     parted \
     e2fsprogs-resize2fs \
     btrfs-tools \
-    kernel-module-usb-f-acm \
-    kernel-module-u-serial \
-    kernel-module-libcomposite \
     "
-
-PACKAGE_INSTALL:remove:qemuarm64 = "kernel-module-usb-f-acm kernel-module-u-serial kernel-module-libcomposite"
 
 # Don't allow the initramfs to contain a kernel
 PACKAGE_EXCLUDE = "kernel-image-*"
