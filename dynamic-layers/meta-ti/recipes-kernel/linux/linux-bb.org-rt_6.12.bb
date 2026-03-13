@@ -70,3 +70,5 @@ KERNEL_DEVICETREE:append:beagley-ai = " \
     ti/k3-am67a-beagley-ai-uart-ttyama0.dtbo \
     ti/k3-am67a-beagley-ai-edgeai-apps.dtbo \
 "
+
+KERNEL_DEVICETREE:remove:beagley-ai = "ti/k3-j722s-evm-fpdlink-iv-fusion.dtbo"
