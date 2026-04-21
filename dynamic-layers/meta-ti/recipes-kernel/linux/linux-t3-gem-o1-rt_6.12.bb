@@ -20,7 +20,7 @@ KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT} ${EXTRA_DTC_ARGS}"
 S = "${WORKDIR}/git"
 
 # 6.12.24 version for 64-bit
-SRCREV:aarch64 = "c0d426f64f22aa7ddba37b5552dd5b2013654990"
+SRCREV:aarch64 = "ad4d7e5d7c6119f09ade65c9f2aa5f62c6e59a67"
 PV:aarch64 = "6.12.24+git"
 BRANCH:aarch64 = "v6.12.24-ti-arm64-r43-t3-gem-o1"
 
