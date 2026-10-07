@@ -1,0 +1,39 @@
+diff --git a/services/server/env/linux/pvr_buffer_sync.c b/services/server/env/linux/pvr_buffer_sync.c
+index 4ebb1f0..4b74be9 100644
+--- a/services/server/env/linux/pvr_buffer_sync.c
++++ b/services/server/env/linux/pvr_buffer_sync.c
+@@ -645,7 +645,7 @@ void pvr_buffer_sync_kick_succeeded(struct pvr_buffer_sync_append_data *data)
+ 	struct dma_resv *resv;
+ 	int i;
+ 
+-	dma_fence_enable_signaling(&data->update_fence->base);
++	dma_fence_enable_sw_signaling(&data->update_fence->base);
+ 
+ 	for (i = 0; i < data->nr_pmrs; i++) {
+ 		resv = pmr_reservation_object_get(data->pmrs[i]);
+diff --git a/services/server/env/linux/pvr_counting_timeline.c b/services/server/env/linux/pvr_counting_timeline.c
+index 4365091..0be2f64 100644
+--- a/services/server/env/linux/pvr_counting_timeline.c
++++ b/services/server/env/linux/pvr_counting_timeline.c
+@@ -249,7 +249,7 @@ pvr_counting_fence_create(struct pvr_counting_fence_timeline *timeline,
+ 	spin_unlock_irqrestore(&timeline->active_fences_lock, flags);
+ 
+ 	/* Counting fences can be signalled any time after creation */
+-	dma_fence_enable_signaling(sw_fence);
++	dma_fence_enable_sw_signaling(sw_fence);
+ 
+ 	return sw_fence;
+ 
+diff --git a/services/server/env/linux/pvr_sync_file.c b/services/server/env/linux/pvr_sync_file.c
+index d941534..b19b846 100644
+--- a/services/server/env/linux/pvr_sync_file.c
++++ b/services/server/env/linux/pvr_sync_file.c
+@@ -264,7 +264,7 @@ static enum PVRSRV_ERROR_TAG pvr_sync_finalise_fence(PVRSRV_FENCE fence_fd,
+ 	}
+ 
+ 	/* pvr fences can be signalled any time after creation */
+-	dma_fence_enable_signaling(&pvr_fence->base);
++	dma_fence_enable_sw_signaling(&pvr_fence->base);
+ 
+ 	fd_install(fence_fd, sync_file->file);
+ 

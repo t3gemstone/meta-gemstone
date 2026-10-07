@@ -25,9 +25,9 @@ IMAGE_NAME_SUFFIX ?= ""
 IMAGE_LINGUAS = ""
 IMAGE_FSTYPES = "${INITRAMFS_FSTYPES}"
 
-DEPENDS:t3-gem-o1 += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
-DEPENDS:t3-gem-s1 += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
-DEPENDS:beagley-ai += "ti-img-rogue-driver virtual/bootloader virtual/kernel"
+DEPENDS:t3-gem-o1 += "rpmsg-net ti-img-rogue-driver virtual/bootloader virtual/kernel"
+DEPENDS:t3-gem-s1 += "rpmsg-net ti-img-rogue-driver virtual/bootloader virtual/kernel"
+DEPENDS:beagley-ai += "rpmsg-net ti-img-rogue-driver virtual/bootloader virtual/kernel"
 
 inherit core-image
 

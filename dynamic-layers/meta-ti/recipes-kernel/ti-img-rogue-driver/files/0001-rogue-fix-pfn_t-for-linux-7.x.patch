@@ -1,0 +1,410 @@
+diff --git a/services/server/env/linux/osfunc.c b/services/server/env/linux/osfunc.c
+index f461523..0d8989d 100644
+--- a/services/server/env/linux/osfunc.c
++++ b/services/server/env/linux/osfunc.c
+@@ -69,7 +69,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ #include <linux/utsname.h>
+ #include <linux/scatterlist.h>
+ #include <linux/interrupt.h>
+-#include <linux/pfn_t.h>
+ #include <linux/pfn.h>
+ #include <linux/sched/clock.h>
+ #include <linux/sched/signal.h>
+@@ -1436,7 +1435,7 @@ static void OSTimerCallbackBody(TIMER_CALLBACK_DATA *psTimerCBData)
+ static void OSTimerCallbackWrapper(struct timer_list *psTimer)
+ {
+ 	TIMER_CALLBACK_DATA *psTimerCBData =
+-		from_timer(psTimerCBData, psTimer, sTimer);
++		container_of(psTimer, TIMER_CALLBACK_DATA, sTimer);
+ #else
+ /*************************************************************************/ /*!
+ @Function       OSTimerCallbackWrapper
+diff --git a/services/server/env/linux/pmr_os.c b/services/server/env/linux/pmr_os.c
+index f968346..720e508 100644
+--- a/services/server/env/linux/pmr_os.c
++++ b/services/server/env/linux/pmr_os.c
+@@ -45,7 +45,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ #include <linux/mm.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/version.h>
+-#include <linux/pfn_t.h>
+ #include <linux/pfn.h>
+ 
+ #include "img_defs.h"
+@@ -297,9 +296,9 @@ static INLINE int _OSMMapPMR(PVRSRV_DEVICE_NODE *psDevNode,
+ 			     IMG_BOOL bUseVMInsertPage, IMG_BOOL bUseMixedMap)
+ {
+ 	IMG_INT32 iStatus;
+-	pfn_t sPFN;
++	unsigned long ulPFN;
+ 
+-	sPFN = phys_to_pfn_t(psCpuPAddr->uiAddr, 0);
++	ulPFN = PHYS_PFN(psCpuPAddr->uiAddr);
+ 
+ 	/*
+ 	 * vm_insert_page() allows insertion of individual pages into user
+@@ -315,7 +314,7 @@ static INLINE int _OSMMapPMR(PVRSRV_DEVICE_NODE *psDevNode,
+ 			vm_fault_t vmf;
+ 
+ 			vmf = vmf_insert_mixed(
+-				ps_vma, ps_vma->vm_start + uiOffset, sPFN);
++				ps_vma, ps_vma->vm_start + uiOffset, ulPFN);
+ 			if (vmf & VM_FAULT_ERROR) {
+ 				iStatus = vm_fault_to_errno(vmf, 0);
+ 			} else {
+@@ -323,13 +322,13 @@ static INLINE int _OSMMapPMR(PVRSRV_DEVICE_NODE *psDevNode,
+ 			}
+ #else
+ 			iStatus = vm_insert_mixed(
+-				ps_vma, ps_vma->vm_start + uiOffset, sPFN);
++				ps_vma, ps_vma->vm_start + uiOffset, ulPFN);
+ #endif
+ 		} else {
+ 			/* Since kernel 3.7 this sets VM_MIXEDMAP internally */
+ 			iStatus = vm_insert_page(ps_vma,
+ 						 ps_vma->vm_start + uiOffset,
+-						 pfn_t_to_page(sPFN));
++						 pfn_to_page(ulPFN));
+ 		}
+ 	} else {
+ 		/*
+@@ -371,7 +370,7 @@ static INLINE int _OSMMapPMR(PVRSRV_DEVICE_NODE *psDevNode,
+ 		size_t uiNumContiguousBytes = 1ULL << uiLog2PageSize;
+ 
+ 		iStatus = remap_pfn_range(ps_vma, ps_vma->vm_start + uiOffset,
+-					  pfn_t_to_pfn(sPFN),
++					  ulPFN,
+ 					  uiNumContiguousBytes,
+ 					  ps_vma->vm_page_prot);
+ 	}
+@@ -417,7 +416,7 @@ static vm_fault_t MMapPMRFault(struct vm_fault *ps_vmf)
+ 	PVR_LOG_GOTO_IF_FALSE(bValid, "Attempted remap with invalid PMR offset",
+ 			      ErrSigFaultReturn);
+ 
+-	ulPFN = pfn_t_to_pfn(phys_to_pfn_t(sCpuPAddr.uiAddr, 0));
++	ulPFN = PHYS_PFN(sCpuPAddr.uiAddr);
+ 
+ 	iFault = vmf_insert_pfn_prot(ps_vmf->vma, ps_vmf->address, ulPFN,
+ 				     ps_vmf->vma->vm_page_prot);
+@@ -610,16 +609,16 @@ OSMMapPMRGeneric(PMR *psPMR, PMR_MMAP_DATA pOSMMapData)
+ 	 * VMA space _only_ if said page is an order-zero allocated page.
+ 	 */
+ 	if (bUseVMInsertPage) {
+-		pfn_t sPFN;
++		unsigned long ulPFN;
+ 
+ 		for (uiOffsetIdx = 0; uiOffsetIdx < uiNumOfPFNs;
+ 		     ++uiOffsetIdx) {
+ 			if (pbValid[uiOffsetIdx]) {
+-				sPFN = phys_to_pfn_t(
+-					psCpuPAddr[uiOffsetIdx].uiAddr, 0);
++				ulPFN = PHYS_PFN(
++					psCpuPAddr[uiOffsetIdx].uiAddr);
+ 
+-				if (!pfn_t_valid(sPFN) ||
+-				    page_count(pfn_t_to_page(sPFN)) == 0) {
++				if (!pfn_valid(ulPFN) ||
++				    page_count(pfn_to_page(ulPFN)) == 0) {
+ 					bUseMixedMap = IMG_TRUE;
+ 					break;
+ 				}
+diff --git a/services/server/env/linux/pvr_buffer_sync.c b/services/server/env/linux/pvr_buffer_sync.c
+index 4b74be9..4ebb1f0 100644
+--- a/services/server/env/linux/pvr_buffer_sync.c
++++ b/services/server/env/linux/pvr_buffer_sync.c
+@@ -645,7 +645,7 @@ void pvr_buffer_sync_kick_succeeded(struct pvr_buffer_sync_append_data *data)
+ 	struct dma_resv *resv;
+ 	int i;
+ 
+-	dma_fence_enable_sw_signaling(&data->update_fence->base);
++	dma_fence_enable_signaling(&data->update_fence->base);
+ 
+ 	for (i = 0; i < data->nr_pmrs; i++) {
+ 		resv = pmr_reservation_object_get(data->pmrs[i]);
+diff --git a/services/server/env/linux/pvr_counting_timeline.c b/services/server/env/linux/pvr_counting_timeline.c
+index 694361c..4365091 100644
+--- a/services/server/env/linux/pvr_counting_timeline.c
++++ b/services/server/env/linux/pvr_counting_timeline.c
+@@ -115,8 +115,8 @@ static void pvr_counting_fence_timeline_debug_request(
+ 				  value, timeline->current_value);
+ 		list_for_each_entry(obj, &timeline->active_fences,
+ 				    active_list_entry) {
+-			obj->fence->ops->fence_value_str(obj->fence, value,
+-							 sizeof(value));
++			snprintf(value, sizeof(value), "%llu",
++				 (u64)obj->fence->seqno);
+ 			PVR_DUMPDEBUG_LOG(pfnDumpDebugPrintf, pvDumpDebugFile,
+ 					  " @%s: val=%llu", value, obj->value);
+ 		}
+@@ -249,7 +249,7 @@ pvr_counting_fence_create(struct pvr_counting_fence_timeline *timeline,
+ 	spin_unlock_irqrestore(&timeline->active_fences_lock, flags);
+ 
+ 	/* Counting fences can be signalled any time after creation */
+-	dma_fence_enable_sw_signaling(sw_fence);
++	dma_fence_enable_signaling(sw_fence);
+ 
+ 	return sw_fence;
+ 
+diff --git a/services/server/env/linux/pvr_export_fence.c b/services/server/env/linux/pvr_export_fence.c
+index d31a612..fca7e99 100644
+--- a/services/server/env/linux/pvr_export_fence.c
++++ b/services/server/env/linux/pvr_export_fence.c
+@@ -270,21 +270,7 @@ static const char *pvr_exp_fence_get_timeline_name(struct dma_fence *fence)
+ 		return "***NO_TIMELINE***";
+ }
+ 
+-static void pvr_exp_fence_value_str(struct dma_fence *fence, char *str,
+-				    int size)
+-{
+-	snprintf(str, size, "%llu", (u64)fence->seqno);
+-}
+ 
+-static void pvr_exp_fence_timeline_value_str(struct dma_fence *fence, char *str,
+-					     int size)
+-{
+-	struct pvr_exp_fence *pvr_exp_fence = to_pvr_exp_fence(fence);
+-
+-	if (pvr_exp_fence && pvr_exp_fence->fence_context)
+-		pvr_exp_fence_context_value_str(pvr_exp_fence->fence_context,
+-						str, size);
+-}
+ 
+ static bool pvr_exp_fence_enable_signaling(struct dma_fence *fence)
+ {
+@@ -369,8 +355,6 @@ static void pvr_exp_fence_release(struct dma_fence *fence)
+ static const struct dma_fence_ops pvr_exp_fence_ops = {
+ 	.get_driver_name = pvr_exp_fence_get_driver_name,
+ 	.get_timeline_name = pvr_exp_fence_get_timeline_name,
+-	.fence_value_str = pvr_exp_fence_value_str,
+-	.timeline_value_str = pvr_exp_fence_timeline_value_str,
+ 	.enable_signaling = pvr_exp_fence_enable_signaling,
+ 	.wait = dma_fence_default_wait,
+ 	.release = pvr_exp_fence_release,
+diff --git a/services/server/env/linux/pvr_fence.c b/services/server/env/linux/pvr_fence.c
+index 563f4c2..1d8871a 100644
+--- a/services/server/env/linux/pvr_fence.c
++++ b/services/server/env/linux/pvr_fence.c
+@@ -110,6 +110,9 @@ void pvr_context_value_str(struct pvr_fence_context *fctx, char *str, int size)
+ 		 refcount_read(&fctx->kref.refcount));
+ }
+ 
++static void pvr_fence_fence_value_str(struct dma_fence *fence,
++				      char *str, int size);
++
+ static void
+ pvr_fence_context_fences_dump(struct pvr_fence_context *fctx,
+ 			      DUMPDEBUG_PRINTF_FUNC *pfnDumpDebugPrintf,
+@@ -128,8 +131,8 @@ pvr_fence_context_fences_dump(struct pvr_fence_context *fctx,
+ 		const char *timeline_value_str = "unknown timeline value";
+ 		const char *fence_value_str = "unknown fence value";
+ 
+-		pvr_fence->base.ops->fence_value_str(&pvr_fence->base, value,
+-						     sizeof(value));
++		pvr_fence_fence_value_str(&pvr_fence->base, value,
++					  sizeof(value));
+ 		PVR_DUMPDEBUG_LOG(pfnDumpDebugPrintf, pvDumpDebugFile, " @%s",
+ 				  value);
+ 
+@@ -185,24 +188,12 @@ pvr_fence_context_fences_dump(struct pvr_fence_context *fctx,
+ 			continue;
+ 		}
+ 
+-		if (fence->ops->timeline_value_str) {
+-			fence->ops->timeline_value_str(fence, value,
+-						       sizeof(value));
+-			timeline_value_str = value;
+-		}
+-
+ 		PVR_DUMPDEBUG_LOG(pfnDumpDebugPrintf, pvDumpDebugFile,
+ 				  " | %s: %s (driver: %s)",
+ 				  fence->ops->get_timeline_name(fence),
+ 				  timeline_value_str,
+ 				  fence->ops->get_driver_name(fence));
+ 
+-		if (fence->ops->fence_value_str) {
+-			fence->ops->fence_value_str(fence, value,
+-						    sizeof(value));
+-			fence_value_str = value;
+-		}
+-
+ 		PVR_DUMPDEBUG_LOG(pfnDumpDebugPrintf, pvDumpDebugFile,
+ 				  " |  @%s (foreign)", fence_value_str);
+ 	}
+@@ -633,14 +624,6 @@ static void pvr_fence_fence_value_str(struct dma_fence *fence, char *str,
+ 		(&pvr_fence->base != pvr_fence->fence) ? "(foreign)" : "");
+ }
+ 
+-static void pvr_fence_timeline_value_str(struct dma_fence *fence, char *str,
+-					 int size)
+-{
+-	struct pvr_fence *pvr_fence = to_pvr_fence(fence);
+-
+-	if (pvr_fence)
+-		pvr_context_value_str(pvr_fence->fctx, str, size);
+-}
+ 
+ static bool pvr_fence_enable_signaling(struct dma_fence *fence)
+ {
+@@ -702,8 +685,6 @@ static void pvr_fence_release(struct dma_fence *fence)
+ static const struct dma_fence_ops pvr_fence_ops = {
+ 	.get_driver_name = pvr_fence_get_driver_name,
+ 	.get_timeline_name = pvr_fence_get_timeline_name,
+-	.fence_value_str = pvr_fence_fence_value_str,
+-	.timeline_value_str = pvr_fence_timeline_value_str,
+ 	.enable_signaling = pvr_fence_enable_signaling,
+ 	.signaled = pvr_fence_is_signaled,
+ 	.wait = dma_fence_default_wait,
+@@ -797,48 +778,7 @@ static const char *pvr_fence_foreign_get_timeline_name(struct dma_fence *fence)
+ 	return "foreign";
+ }
+ 
+-static void pvr_fence_foreign_fence_value_str(struct dma_fence *fence,
+-					      char *str, int size)
+-{
+-	struct pvr_fence *pvr_fence = to_pvr_fence(fence);
+-	u32 sync_addr = 0;
+-	u32 sync_value_next;
+-
+-	if (WARN_ON(!pvr_fence))
+-		return;
+-
+-	sync_addr = SyncCheckpointGetFirmwareAddr(pvr_fence->sync_checkpoint);
+-	sync_value_next = PVRSRV_SYNC_CHECKPOINT_SIGNALLED;
+-
+-	/*
+-	 * Include the fence flag bits from the foreign fence instead of our
+-	 * shadow copy. This is done as the shadow fence flag bits aren't used.
+-	 */
+-	snprintf(str, size,
+-		 "%llu: (%s%s) refs=%u fwaddr=%#08x cur=%#08x nxt=%#08x %s",
+-		 (u64)fence->seqno,
+-		 test_bit(DMA_FENCE_FLAG_ENABLE_SIGNAL_BIT,
+-			  &pvr_fence->fence->flags) ?
+-			 "+" :
+-			 "-",
+-		 test_bit(DMA_FENCE_FLAG_SIGNALED_BIT,
+-			  &pvr_fence->fence->flags) ?
+-			 "+" :
+-			 "-",
+-		 refcount_read(&fence->refcount.refcount),
+-		 PVRSRV_UFO_GET_FWADDR(sync_addr),
+-		 pvr_fence_sync_value(pvr_fence), sync_value_next,
+-		 pvr_fence->name);
+-}
+-
+-static void pvr_fence_foreign_timeline_value_str(struct dma_fence *fence,
+-						 char *str, int size)
+-{
+-	struct pvr_fence *pvr_fence = to_pvr_fence(fence);
+ 
+-	if (pvr_fence)
+-		pvr_context_value_str(pvr_fence->fctx, str, size);
+-}
+ 
+ static bool pvr_fence_foreign_enable_signaling(struct dma_fence *fence)
+ {
+@@ -881,8 +821,6 @@ static void pvr_fence_foreign_release(struct dma_fence *fence)
+ static const struct dma_fence_ops pvr_fence_foreign_ops = {
+ 	.get_driver_name = pvr_fence_foreign_get_driver_name,
+ 	.get_timeline_name = pvr_fence_foreign_get_timeline_name,
+-	.fence_value_str = pvr_fence_foreign_fence_value_str,
+-	.timeline_value_str = pvr_fence_foreign_timeline_value_str,
+ 	.enable_signaling = pvr_fence_foreign_enable_signaling,
+ 	.wait = pvr_fence_foreign_wait,
+ 	.release = pvr_fence_foreign_release,
+diff --git a/services/server/env/linux/pvr_fence_trace.h b/services/server/env/linux/pvr_fence_trace.h
+index 9fba2bd..5cde1a6 100644
+--- a/services/server/env/linux/pvr_fence_trace.h
++++ b/services/server/env/linux/pvr_fence_trace.h
+@@ -95,8 +95,8 @@ DECLARE_EVENT_CLASS(
+ 			       fence->base.ops->get_driver_name(&fence->base));
+ 		pvr_assign_str(timeline,
+ 			       fence->base.ops->get_timeline_name(&fence->base));
+-		fence->base.ops->fence_value_str(&fence->base, __entry->val,
+-						 sizeof(__entry->val));
++		pvr_context_value_str(fence->fctx, __entry->val,
++				       sizeof(__entry->val));
+ 		__entry->context = fence->base.context;),
+ 
+ 	TP_printk("driver=%s timeline=%s ctx=%llu val=%s", __get_str(driver),
+@@ -141,8 +141,8 @@ DECLARE_EVENT_CLASS(
+ 			       fence->base.ops->get_driver_name(&fence->base));
+ 		pvr_assign_str(timeline,
+ 			       fence->base.ops->get_timeline_name(&fence->base));
+-		fence->base.ops->fence_value_str(&fence->base, __entry->val,
+-						 sizeof(__entry->val));
++		pvr_context_value_str(fence->fctx, __entry->val,
++				       sizeof(__entry->val));
+ 		__entry->context = fence->base.context;
+ 		pvr_assign_str(foreign_driver,
+ 			       fence->fence->ops->get_driver_name ?
+@@ -154,12 +154,8 @@ DECLARE_EVENT_CLASS(
+ 				       fence->fence->ops->get_timeline_name(
+ 					       fence->fence) :
+ 				       "unknown");
+-		fence->fence->ops->fence_value_str ?
+-			fence->fence->ops->fence_value_str(
+-				fence->fence, __entry->foreign_val,
+-				sizeof(__entry->foreign_val)) :
+-			(void)OSStringSafeCopy(__entry->foreign_val, "unknown",
+-					       sizeof(__entry->foreign_val));
++		OSStringSafeCopy(__entry->foreign_val, "unknown",
++				 sizeof(__entry->foreign_val));
+ 		__entry->foreign_context = fence->fence->context;),
+ 
+ 	TP_printk(
+diff --git a/services/server/env/linux/pvr_sw_fence.c b/services/server/env/linux/pvr_sw_fence.c
+index cb6fab1..99e3f99 100644
+--- a/services/server/env/linux/pvr_sw_fence.c
++++ b/services/server/env/linux/pvr_sw_fence.c
+@@ -98,18 +98,7 @@ static const char *pvr_sw_fence_get_timeline_name(struct dma_fence *fence)
+ 	return pvr_sw_fence_context_name(pvr_sw_fence->fence_context);
+ }
+ 
+-static void pvr_sw_fence_value_str(struct dma_fence *fence, char *str, int size)
+-{
+-	snprintf(str, size, "%llu", (u64)fence->seqno);
+-}
+-
+-static void pvr_sw_fence_timeline_value_str(struct dma_fence *fence, char *str,
+-					    int size)
+-{
+-	struct pvr_sw_fence *pvr_sw_fence = to_pvr_sw_fence(fence);
+ 
+-	pvr_sw_fence_context_value_str(pvr_sw_fence->fence_context, str, size);
+-}
+ 
+ static bool pvr_sw_fence_enable_signaling(struct dma_fence *fence)
+ {
+@@ -143,8 +132,6 @@ static void pvr_sw_fence_release(struct dma_fence *fence)
+ static const struct dma_fence_ops pvr_sw_fence_ops = {
+ 	.get_driver_name = pvr_sw_fence_get_driver_name,
+ 	.get_timeline_name = pvr_sw_fence_get_timeline_name,
+-	.fence_value_str = pvr_sw_fence_value_str,
+-	.timeline_value_str = pvr_sw_fence_timeline_value_str,
+ 	.enable_signaling = pvr_sw_fence_enable_signaling,
+ 	.wait = dma_fence_default_wait,
+ 	.release = pvr_sw_fence_release,
+diff --git a/services/server/env/linux/pvr_sync_file.c b/services/server/env/linux/pvr_sync_file.c
+index 29e6856..d941534 100644
+--- a/services/server/env/linux/pvr_sync_file.c
++++ b/services/server/env/linux/pvr_sync_file.c
+@@ -264,7 +264,7 @@ static enum PVRSRV_ERROR_TAG pvr_sync_finalise_fence(PVRSRV_FENCE fence_fd,
+ 	}
+ 
+ 	/* pvr fences can be signalled any time after creation */
+-	dma_fence_enable_sw_signaling(&pvr_fence->base);
++	dma_fence_enable_signaling(&pvr_fence->base);
+ 
+ 	fd_install(fence_fd, sync_file->file);
+ 
+@@ -1290,7 +1290,8 @@ static void _dump_sync_point(struct dma_fence *fence,
+ 	bool signaled = dma_fence_is_signaled(fence);
+ 	char time[16] = { '\0' };
+ 
+-	fence_ops->timeline_value_str(fence, time, sizeof(time));
++	if (is_pvr_fence(fence))
++		pvr_context_value_str(to_pvr_fence(fence)->fctx, time, sizeof(time));
+ 
+ 	PVR_DUMPDEBUG_LOG(dump_debug_printf, dump_debug_file,
+ 			  "<" IMG_KM_PTR_FMTSPEC
